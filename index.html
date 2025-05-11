@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>母亲节祝福</title>
+    <style type="text/css">
+        body {
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(135deg, #fff3e6 0%, #ffe6f2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #contents {
+            position: absolute;
+            color: #6d4c41;
+            font-size: 2.8em;
+            text-align: center;
+            z-index: 2;
+            text-shadow: 0 0 20px rgba(255,105,180,0.6);
+            line-height: 1.4;
+        }
+        canvas {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body onclick="bodyPlayMusic()">
+    <div id="contents">妈妈👩<br>母亲节快乐🌹</div>
+    <canvas id="heartCanvas"></canvas>
+    
+    <script>
+        const canvas = document.getElementById('heartCanvas');
+        const ctx = canvas.getContext('2d');
+        let phase = 0;
+        let roseProgress = 0;
+        let roses = [];
+
+        class Rose {
+            constructor(ctx, x, y, scale) {
+                this.ctx = ctx;
+                this.x = x;
+                this.y = y;
+                this.scale = scale || 1;
+                this.progress = 0;
+            }
+
+            draw(progress) {
+                this.progress = progress;
+                this.drawStem();
+                this.drawFlower();
+            }
+
+            drawStem() {
+                const ctx = this.ctx;
+                const stemLength = 120 * this.scale;
+                
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.strokeStyle = '#76ff03';
+                ctx.lineWidth = 5 * this.scale;
+                ctx.lineCap = 'round';
+
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                ctx.lineTo(0, -stemLength * this.progress);
+                ctx.stroke();
+
+                if (this.progress > 0.3) {
+                    const leafProgress = Math.min(1, (this.progress - 0.3)/0.7);
+                    ctx.strokeStyle = '#4CAF50';
+                    
+                    ctx.save();
+                    ctx.translate(0, -stemLength * 0.5 * this.progress);
+                    ctx.rotate(-0.4);
+                    ctx.beginPath();
+                    ctx.bezierCurveTo(
+                        0, 0,
+                        -30 * this.scale, -20 * leafProgress,
+                        -45 * this.scale, 10 * leafProgress
+                    );
+                    ctx.stroke();
+                    ctx.restore();
+
+                    ctx.save();
+                    ctx.translate(0, -stemLength * 0.3 * this.progress);
+                    ctx.rotate(0.3);
+                    ctx.beginPath();
+                    ctx.bezierCurveTo(
+                        0, 0,
+                        30 * this.scale, -15 * leafProgress,
+                        40 * this.scale, 10 * leafProgress
+                    );
+                    ctx.stroke();
+                    ctx.restore();
+                }
+                ctx.restore();
+            }
+
+            drawFlower() {
+                const ctx = this.ctx;
+                const flowerProgress = Math.min(1, this.progress * 1.5);
+                
+                ctx.save();
+                ctx.translate(this.x, this.y - 120 * this.scale * this.progress);
+                
+                if(flowerProgress > 0) {
+                    ctx.strokeStyle = `hsla(330, 100%, ${60 + 30*flowerProgress}%, 0.9)`;
+                    ctx.lineWidth = 2 * this.scale;
+                    
+                    for(let i=0; i<6; i++) {
+                        ctx.rotate((Math.PI*2)/6);
+                        if(flowerProgress > i/6) {
+                            ctx.beginPath();
+                            ctx.arc(20 * this.scale, 0, 15 * this.scale, Math.PI/2, Math.PI*1.5);
+                            ctx.stroke();
+                        }
+                    }
+
+                    if(flowerProgress > 0.5) {
+                        ctx.rotate(Math.PI/6);
+                        for(let i=0; i<6; i++) {
+                            ctx.rotate((Math.PI*2)/6);
+                            ctx.beginPath();
+                            ctx.arc(10 * this.scale, 0, 8 * this.scale, Math.PI/2, Math.PI*1.5);
+                            ctx.stroke();
+                        }
+                    }
+                }
+
+                if(flowerProgress >= 0.8) {
+                    ctx.beginPath();
+                    ctx.arc(0, 0, 6 * this.scale, 0, Math.PI*2);
+                    ctx.fillStyle = `hsla(60, 100%, ${70 * (flowerProgress-0.8)/0.2}%, 1)`;
+                    ctx.fill();
+                }
+                ctx.restore();
+            }
+        }
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            initRoses();
+        }
+
+        function initRoses() {
+            const baseX = canvas.width/2;
+            const baseY = canvas.height/2 + 220;
+            roses = [];
+            for(let i=0; i<5; i++) {
+                roses.push(new Rose(
+                    ctx,
+                    baseX - 80 + i*35,
+                    baseY + i*10,
+                    0.7 + i*0.1
+                ));
+            }
+        }
+
+        function drawAnimatedHeart() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const gradient = ctx.createLinearGradient(0, canvas.height/2, canvas.width, canvas.height/2);
+            gradient.addColorStop(0, 'rgba(255,105,180,0.9)');
+            gradient.addColorStop(1, 'rgba(255,20,147,0.9)');
+            
+            ctx.beginPath();
+            ctx.moveTo(canvas.width/2, canvas.height/2 - 100);
+            ctx.bezierCurveTo(canvas.width/2, canvas.height/2 - 150, 
+                            canvas.width/2 - 150, canvas.height/2 - 200, 
+                            canvas.width/2 - 150, canvas.height/2 - 100);
+            ctx.bezierCurveTo(canvas.width/2 - 150, canvas.height/2 + 50,
+                            canvas.width/2, canvas.height/2 + 200,
+                            canvas.width/2, canvas.height/2 + 300);
+            ctx.bezierCurveTo(canvas.width/2, canvas.height/2 + 200,
+                            canvas.width/2 + 150, canvas.height/2 + 50,
+                            canvas.width/2 + 150, canvas.height/2 - 100);
+            ctx.bezierCurveTo(canvas.width/2 + 150, canvas.height/2 - 200,
+                            canvas.width/2, canvas.height/2 - 150,
+                            canvas.width/2, canvas.height/2 - 100);
+            ctx.closePath();
+
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = 10 + 5 * Math.sin(phase);
+            ctx.shadowColor = 'rgba(255,105,180,0.6)';
+            ctx.shadowBlur = 30 * Math.abs(Math.sin(phase/2));
+            ctx.stroke();
+
+            if(roseProgress < 1) {
+                roseProgress += 0.005;
+                roses.forEach(rose => rose.draw(roseProgress));
+            } else {
+                roses.forEach(rose => {
+                    rose.draw(1 + Math.sin(phase * 2) * 0.1);
+                });
+            }
+
+            phase += 0.03;
+            requestAnimationFrame(drawAnimatedHeart);
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        drawAnimatedHeart();
+    </script>
+</body>
+</html>
